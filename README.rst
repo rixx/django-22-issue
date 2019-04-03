@@ -1,28 +1,29 @@
 This repo documents a potential issue in Django 2.2.
 
-Setup
------
+Reproduce the issue
+-------------------
 
-These steps were executed:
+Either via tests:
 
 ```
-pip install django pytest pytest-django  # Installing Django 2.2.0 and deps
-django-admin startproject fktest
+pip install django pytest pytest-django
 cd fktest
-python manage.py startapp fk  # Add to INSTALLED_APPS
-# Add fk/models.py
+DJANGO_SETTINGS_MODULE=fktest.settings pytest
+```
+
+Or via the Python REPL:
+
+```
 python manage.py makemigrations
 python manage.py migrate
 python manage.py shell
 
 from fk.models import Author, Book
 a = Author.objects.create(name='Bill')
-b1 = Book.objects.create(title='Sonnets', state='deleted', author=a)
-
-b2 = Book.objects.create(title='Hamlet', author=a)
-a.books.count()
-a.books.all().count()
-
-
-DJANGO_SETTINGS_MODULE=fktest.settings pytest
+b1 = Book.objects.create(title='Sonnets', state='deleted')
+b2 = Book.objects.create(title='Hamlet')
+b1.authors.add(a)
+b2.authors.add(a)
+a.books.count()  # 2
+a.books.all().count()  # 1
 ```
