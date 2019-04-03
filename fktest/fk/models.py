@@ -12,7 +12,7 @@ class BookManager(models.Manager):
 
 class Book(models.Model):
     title = models.CharField(max_length=100)
-    author = models.ForeignKey(to=Author, related_name='books', on_delete=models.CASCADE)
+    authors = models.ManyToManyField(to=Author, related_name='books')
     state = models.CharField(choices=(('regular', 'regular'), ('deleted', 'deleted')), default='regular', max_length=100)
 
     objects = BookManager()
